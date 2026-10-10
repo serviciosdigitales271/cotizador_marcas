@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotizador Multimarca - Internet Ecuador</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        netlife: { primary: '#FF6600', light: '#FFF3EE', dark: '#D95300' },
+                        ecuanet: { primary: '#0055A5', light: '#E6F0FA', dark: '#003B75' },
+                        fibramax: { primary: '#E53E3E', dark: '#1A202C', accent: '#000000' },
+                        opticom: { primary: '#0EA5E9', accent: '#F97316', light: '#F0F9FF' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100 font-sans min-h-screen flex flex-col">
+
+    <!-- Header Principal -->
+    <header class="bg-gray-900 text-white py-4 shadow-md">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold flex items-center gap-2">
+                <i class="fa-solid fa-wifi text-sky-400"></i> Cotizador Comercial de Planes de Internet
+            </h1>
+            <span class="text-sm bg-gray-800 px-3 py-1 rounded-full text-gray-300">Octubre 2026</span>
+        </div>
+    </header>
+
+    <!-- Navegación de Marcas (Pestañas) -->
+    <nav class="bg-white shadow border-b">
+        <div class="container mx-auto px-4 flex flex-wrap justify-center md:justify-start gap-2 py-3">
+            <button onclick="switchTab('netlife')" id="btn-netlife" class="tab-btn px-5 py-2.5 rounded-lg font-semibold text-sm transition-all shadow-sm bg-netlife-primary text-white">
+                <i class="fa-solid fa-bolt mr-1"></i> Netlife
+            </button>
+            <button onclick="switchTab('ecuanet')" id="btn-ecuanet" class="tab-btn px-5 py-2.5 rounded-lg font-semibold text-sm transition-all shadow-sm bg-gray-200 text-gray-700 hover:bg-gray-300">
+                <i class="fa-solid fa-globe mr-1"></i> Ecuanet
+            </button>
+            <button onclick="switchTab('fibramax')" id="btn-fibramax" class="tab-btn px-5 py-2.5 rounded-lg font-semibold text-sm transition-all shadow-sm bg-gray-200 text-gray-700 hover:bg-gray-300">
+                <i class="fa-solid fa-gauge-high mr-1"></i> Fibramax
+            </button>
+            <button onclick="switchTab('opticom')" id="btn-opticom" class="tab-btn px-5 py-2.5 rounded-lg font-semibold text-sm transition-all shadow-sm bg-gray-200 text-gray-700 hover:bg-gray-300">
+                <i class="fa-solid fa-signal mr-1"></i> Opticom
+            </button>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="container mx-auto px-4 py-8 flex-grow max-w-5xl">
+
+        <!-- Selector Global de Forma de Pago -->
+        <div class="bg-white rounded-xl shadow p-4 mb-6 border flex flex-wrap items-center justify-between gap-4">
+            <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+                    <i class="fa-solid fa-building-columns text-sky-600 mr-1"></i> Selecciona la Forma de Pago:
+                </label>
+                <p class="text-xs text-gray-500">Los descuentos promocionales de Netlife y Ecuanet aplican únicamente con Débito Bancario / Cuenta Ahorros o Corriente (CA).</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <select id="payment-method-select" onchange="updatePaymentMethod(this.value)" class="px-4 py-2 bg-gray-50 border rounded-lg font-semibold text-sm text-gray-800 focus:ring-2 focus:ring-sky-500 outline-none shadow-sm">
+                    <option value="CA">Cuenta Bancaria / Débito Bancario (CA)</option>
+                    <option value="EFECTIVO">Efectivo / Transferencia Directa</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- COTIZADOR NETLIFE (Anaranjado) -->
+        <div id="tab-netlife" class="tab-content">
+            <div class="bg-netlife-light border-l-4 border-netlife-primary p-4 mb-6 rounded-r-lg shadow-sm">
+                <h2 class="text-xl font-bold text-netlife-dark">Cotizador Oficial Netlife</h2>
+                <p class="text-sm text-gray-600">El descuento promocional aplica únicamente registrando Débito Bancario / Cuenta (CA).</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4 mb-6" id="plans-netlife"></div>
+        </div>
+
+        <!-- COTIZADOR ECUANET (Azul) -->
+        <div id="tab-ecuanet" class="tab-content hidden">
+            <div class="bg-blue-50 border-l-4 border-ecuanet-primary p-4 mb-6 rounded-r-lg shadow-sm">
+                <h2 class="text-xl font-bold text-ecuanet-dark">Cotizador Oficial Ecuanet</h2>
+                <p class="text-sm text-gray-600">Descuento promocional de 6 facturas disponible únicamente con Débito Bancario / Cuenta (CA).</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4 mb-6" id="plans-ecuanet"></div>
+        </div>
+
+        <!-- COTIZADOR FIBRAMAX (Rojo con Negro) -->
+        <div id="tab-fibramax" class="tab-content hidden">
+            <div class="bg-red-50 border-l-4 border-fibramax-primary p-4 mb-6 rounded-r-lg shadow-sm">
+                <h2 class="text-xl font-bold text-red-700">Cotizador Oficial Fibramax</h2>
+                <p class="text-sm text-gray-600">Planes con canales de TV y meses de cortesía sujetos a Débito Bancario.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4 mb-6" id="plans-fibramax"></div>
+        </div>
+
+        <!-- COTIZADOR OPTICOM (Celeste con Anaranjado) -->
+        <div id="tab-opticom" class="tab-content hidden">
+            <div class="bg-sky-50 border-l-4 border-sky-500 p-4 mb-6 rounded-r-lg shadow-sm">
+                <h2 class="text-xl font-bold text-sky-900">Cotizador Oficial Opticom</h2>
+                <p class="text-sm text-gray-600">Tarifa fija con Zaping Básico. Aplica para cualquier forma de pago.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4 mb-6" id="plans-opticom"></div>
+        </div>
+
+        <!-- Panel Resumen y Envío por WhatsApp -->
+        <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200 mt-8">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-cart-shopping text-green-600"></i> Resumen de Cotización Seleccionada
+            </h3>
+            <div id="summary-content" class="bg-gray-50 p-4 rounded-lg mb-4 text-gray-700 text-sm border">
+                Ningún plan seleccionado todavía. Elija un plan arriba para generar la cotización.
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Nombre del Cliente:</label>
+                    <input type="text" id="client-name" placeholder="Ej. Juan Pérez" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-sky-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Ciudad / Sector:</label>
+                    <input type="text" id="client-sector" placeholder="Ej. Quito / Iñaquito" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-sky-500 outline-none">
+                </div>
+            </div>
+
+            <button onclick="sendWhatsApp()" id="whatsapp-btn" disabled class="w-full bg-gray-300 text-gray-500 font-bold py-3 px-6 rounded-xl transition-all flex items-center justify-center gap-2 cursor-not-allowed shadow">
+                <i class="fa-brands fa-whatsapp text-xl"></i> Enviar Cotización por WhatsApp
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-400 py-4 text-center text-xs mt-auto">
+        <p>Sistema de Cotizaciones Comerciales • Contacto Asesor: 0987909732</p>
+    </footer>
+
+    <!-- Lógica JavaScript -->
+    <script>
+        const WHATSAPP_NUMBER = "593987909732";
+        let selectedPaymentMethod = "CA";
+
+        const dataPlans = {
+            netlife: [
+                { name: "GI Beginner-Defense 150Mbps + Netlife Play", speed: "600Mbps x 18 meses", priceNormal: 25.29, pricePromo: 21.49, promoMonths: 6 },
+                { name: "GI Beginner-Defense 200Mbps + Netlife Play", speed: "900Mbps x 18 meses", priceNormal: 27.03, pricePromo: 22.98, promoMonths: 6 },
+                { name: "GI Net-Defense 400Mbps + EXTENSOR", speed: "900Mbps x 18 meses", priceNormal: 28.18, pricePromo: 22.54, promoMonths: 6 },
+                { name: "GI Net-Defense 400Mbps + Netlife Play", speed: "900Mbps x 18 meses", priceNormal: 28.18, pricePromo: 22.54, promoMonths: 6 },
+                { name: "GI Entry-Defense 750Mbps + EXTENSOR", speed: "1200Mbps x 18 meses", priceNormal: 29.61, pricePromo: 23.69, promoMonths: 7 },
+                { name: "GI Entry-Defense 750Mbps + Netlife Play", speed: "1200Mbps x 18 meses", priceNormal: 29.61, pricePromo: 23.69, promoMonths: 7 },
+                { name: "GI Starter-Defense 850Mbps + 2 EXTENSOR", speed: "1300Mbps x 18 meses", priceNormal: 33.93, pricePromo: 20.36, promoMonths: 9 },
+                { name: "NX Starter-Defense 1500Mbps", speed: "1500Mbps", priceNormal: 34.49, pricePromo: 20.69, promoMonths: 9 },
+                { name: "NX Spirit-Defense 1600Mbps", speed: "1600Mbps", priceNormal: 40.24, pricePromo: 24.14, promoMonths: 9 }
+            ],
+            ecuanet: [
+                { name: "NX ECU Plan fibra 50Mbps", speed: "200Mbps x 18 meses", priceNormal: 17.53, pricePromo: null, promoMonths: null },
+                { name: "NX ECU Plan fibra 100Mbps", speed: "400Mbps x 18 meses", priceNormal: 18.98, pricePromo: 17.08, promoMonths: 6 },
+                { name: "NX ECU Plan fibra 200Mbps", speed: "500Mbps x 18 meses", priceNormal: 20.69, pricePromo: 18.62, promoMonths: 6 },
+                { name: "NX ECU Plan fibra 300Mbps", speed: "550Mbps x 18 meses", priceNormal: 22.89, pricePromo: 20.60, promoMonths: 6 },
+                { name: "NX ECU Plan fibra 450Mbps", speed: "600Mbps x 18 meses", priceNormal: 25.30, pricePromo: 22.77, promoMonths: 6 }
+            ],
+            fibramax: [
+                { name: "PLAN 700mb + 40 Señales de Video + App TV Max", speed: "700 Mbps (1 Mes Gratis)", priceNormal: 24.12, pricePromo: null, promoMonths: null },
+                { name: "PLAN 1000mb + 70 Señales de Video + App TV Max", speed: "1000 Mbps (2 Meses Gratis)", priceNormal: 26.42, pricePromo: null, promoMonths: null }
+            ],
+            opticom: [
+                { name: "PLAN DE 300 Mbps + Zaping Básico", speed: "300 Mbps", priceNormal: 19.00, pricePromo: null, promoMonths: null },
+                { name: "PLAN DE 400 Mbps + Zaping Básico", speed: "400 Mbps", priceNormal: 23.00, pricePromo: null, promoMonths: null },
+                { name: "PLAN DE 500 Mbps + Zaping Básico", speed: "500 Mbps", priceNormal: 26.00, pricePromo: null, promoMonths: null },
+                { name: "PLAN DE 750 Mbps + Zaping Básico", speed: "750 Mbps", priceNormal: 30.00, pricePromo: null, promoMonths: null },
+                { name: "PLAN DE 1000 Mbps + Zaping Básico", speed: "1000 Mbps", priceNormal: 33.00, pricePromo: null, promoMonths: null }
+            ]
+        };
+
+        let selectedPlanData = null;
+
+        function updatePaymentMethod(val) {
+            selectedPaymentMethod = val;
+            renderPlans();
+            if (selectedPlanData) {
+                const brandKey = selectedPlanData.brand.toLowerCase();
+                const planIdx = dataPlans[brandKey].findIndex(p => p.name === selectedPlanData.name);
+                if (planIdx !== -1) selectPlan(brandKey, planIdx);
+            }
+        }
+
+        function renderPlans() {
+            for (let brand in dataPlans) {
+                const container = document.getElementById('plans-' + brand);
+                if (!container) continue;
+                container.innerHTML = "";
+
+                dataPlans[brand].forEach((plan, index) => {
+                    const card = document.createElement('div');
+                    card.className = "bg-white border rounded-xl p-4 shadow-sm hover:shadow-md transition-all flex flex-col justify-between border-gray-200";
+                    
+                    const isPromoEligible = (brand === 'netlife' || brand === 'ecuanet') && selectedPaymentMethod === 'CA' && plan.pricePromo;
+
+                    let priceHtml = '<div class="mt-2"><span class="text-xs font-semibold text-gray-500 uppercase block">Precio Regular</span><span class="text-lg font-bold text-gray-800">$' + plan.priceNormal.toFixed(2) + ' <span class="text-xs font-normal text-gray-500">/mes inc. imp</span></span></div>';
+
+                    if (isPromoEligible) {
+                        priceHtml = '<div class="mt-2 space-y-1"><div class="bg-green-50 p-2 rounded-lg border border-green-200"><span class="text-xs font-bold text-green-700 block"><i class="fa-solid fa-tag mr-1"></i> Descuento Débito Bancario (' + plan.promoMonths + ' Facturas):</span><span class="text-lg font-bold text-green-600">$' + plan.pricePromo.toFixed(2) + ' <span class="text-xs font-normal text-gray-600">/mes inc. imp</span></span></div><div class="text-xs text-gray-500 pt-1"><strong>Precio Regular después:</strong> $' + plan.priceNormal.toFixed(2) + ' /mes</div></div>';
+                    } else if ((brand === 'netlife' || brand === 'ecuanet') && selectedPaymentMethod === 'EFECTIVO' && plan.pricePromo) {
+                        priceHtml += '<div class="text-xs text-amber-600 mt-1 font-medium bg-amber-50 p-1.5 rounded border border-amber-200"><i class="fa-solid fa-circle-info mr-1"></i> Para aplicar el descuento promocional ($' + plan.pricePromo.toFixed(2) + '), seleccione Débito Bancario.</div>';
+                    }
+
+                    let paymentLabel = "";
+                    if (brand === 'netlife' || brand === 'ecuanet') paymentLabel = "Req. Débito Bancario (CA) para Descuento";
+                    else if (brand === 'fibramax') paymentLabel = "Req. Débito Bancario";
+                    else paymentLabel = "Aplica Cualquier Forma de Pago";
+
+                    card.innerHTML = '<div><div class="flex items-center justify-between"><span class="text-xs uppercase tracking-wider font-semibold px-2 py-0.5 bg-gray-100 text-gray-600 rounded">' + brand.toUpperCase() + '</span><span class="text-[10px] font-medium text-gray-500"><i class="fa-solid fa-building-columns mr-1"></i>' + paymentLabel + '</span></div><h4 class="font-bold text-gray-800 mt-2 text-sm">' + plan.name + '</h4><p class="text-xs text-gray-500 mt-1"><i class="fa-solid fa-gauge text-sky-500 mr-1"></i> ' + plan.speed + '</p></div><div class="mt-3 pt-3 border-t">' + priceHtml + '<button onclick="selectPlan(\'' + brand + '\', ' + index + ')" class="mt-3 w-full py-2 bg-gray-900 text-white text-xs rounded-lg hover:bg-gray-800 transition font-medium">Seleccionar este Plan</button></div>';
+
+                    container.appendChild(card);
+                });
+            }
+        }
+
+        function switchTab(brand) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            const targetTab = document.getElementById('tab-' + brand);
+            if (targetTab) targetTab.classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn px-5 py-2.5 rounded-lg font-semibold text-sm transition-all shadow-sm bg-gray-200 text-gray-700 hover:bg-gray-300";
+            });
+
+            const activeBtn = document.getElementById('btn-' + brand);
+            if (activeBtn) {
+                if (brand === 'netlife') activeBtn.className = "tab-btn px-5 py-2.5 rounded-lg font-semibold text-sm transition-all shadow-sm bg-netlife-primary text-white";
+                if (brand === 'ecuanet') activeBtn.className = "tab-btn px-5 py-2.5 rounded-lg font-semibold text-sm transition-all shadow-sm bg-ecuanet-primary text-white";
+                if (brand === 'fibramax') activeBtn.className = "tab-btn px-5 py-2.5 rounded-lg font-semibold text-sm transition-all shadow-sm bg-fibramax-dark text-white border border-red-600";
+                if (brand === 'opticom') activeBtn.className = "tab-btn px-5 py-2.5 rounded-lg font-semibold text-sm transition-all shadow-sm bg-sky-500 text-white";
+            }
+        }
+
+        function selectPlan(brand, index) {
+            const plan = dataPlans[brand][index];
+            selectedPlanData = { brand: brand.toUpperCase(), ...plan };
+
+            const isPromoActive = (brand === 'netlife' || brand === 'ecuanet') && selectedPaymentMethod === 'CA' && plan.pricePromo;
+
+            let paymentText = selectedPaymentMethod === 'CA' ? 'Cuenta Bancaria / Débito Bancario (CA)' : 'Efectivo / Transferencia';
+            if (brand === 'fibramax') paymentText = 'Débito Bancario';
+            if (brand === 'opticom') paymentText = 'Cualquier Forma de Pago (Efectivo / Débito)';
+
+            let priceDetail = '<p><strong>Precio Regular:</strong> $' + plan.priceNormal.toFixed(2) + ' /mes inc. impuestos</p>';
+            if (isPromoActive) {
+                priceDetail = '<p class="text-green-600 font-semibold"><strong>Precio Promocional (' + plan.promoMonths + ' Facturas por Débito Bancario):</strong> $' + plan.pricePromo.toFixed(2) + ' /mes inc. impuestos</p><p class="text-gray-700"><strong>Precio Regular posterior:</strong> $' + plan.priceNormal.toFixed(2) + ' /mes inc. impuestos</p>';
+            }
+
+            document.getElementById('summary-content').innerHTML = '<div class="space-y-1.5"><p><strong>Operadora:</strong> <span class="text-sky-600 font-bold">' + selectedPlanData.brand + '</span></p><p><strong>Plan:</strong> ' + plan.name + '</p><p><strong>Detalle / Velocidad:</strong> ' + plan.speed + '</p><p><strong>Forma de Pago Seleccionada:</strong> <span class="font-semibold">' + paymentText + '</span></p>' + priceDetail + '</div>';
+
+            const btn = document.getElementById('whatsapp-btn');
+            btn.disabled = false;
+            btn.className = "w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer";
+        }
+
+        function sendWhatsApp() {
+            if (!selectedPlanData) return;
+
+            const clientName = document.getElementById('client-name').value.trim() || "Cliente Interesado";
+            const clientSector = document.getElementById('client-sector').value.trim() || "Por definir";
+
+            const brandKey = selectedPlanData.brand.toLowerCase();
+            const isPromoActive = (brandKey === 'netlife' || brandKey === 'ecuanet') && selectedPaymentMethod === 'CA' && selectedPlanData.pricePromo;
+
+            let paymentText = selectedPaymentMethod === 'CA' ? 'Cuenta Bancaria / Débito Bancario (CA)' : 'Efectivo / Transferencia';
+            if (brandKey === 'fibramax') paymentText = 'Débito Bancario';
+            if (brandKey === 'opticom') paymentText = 'Cualquier Forma de Pago';
+
+            let message = "Hola, me interesa la siguiente cotización de internet:\n\n";
+            message += "🏢 *Operadora:* " + selectedPlanData.brand + "\n";
+            message += "📡 *Plan:* " + selectedPlanData.name + "\n";
+            message += "⚡ *Detalle:* " + selectedPlanData.speed + "\n";
+            message += "🏦 *Forma de Pago:* " + paymentText + "\n\n";
+
+            if (isPromoActive) {
+                message += "🏷️ *Precio Promocional:* $" + selectedPlanData.pricePromo.toFixed(2) + " /mes (" + selectedPlanData.promoMonths + " facturas)\n";
+                message += "💵 *Precio Regular posterior:* $" + selectedPlanData.priceNormal.toFixed(2) + " /mes inc. imp.\n\n";
+            } else {
+                message += "💵 *Precio Aplicable:* $" + selectedPlanData.priceNormal.toFixed(2) + " /mes inc. imp.\n\n";
+            }
+
+            message += "👤 *Cliente:* " + clientName + "\n";
+            message += "📍 *Ciudad/Sector:* " + clientSector + "\n\n";
+            message += "Por favor, ayúdeme con la contratación o más detalles.";
+
+            const encodedUrl = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(message);
+            window.open(encodedUrl, '_blank');
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            renderPlans();
+        });
+    </script>
+</body>
+</html>
